@@ -1,6 +1,6 @@
 {
   "name": "@amdirent/react-json-logic",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "Build and evaluate JsonLogic rules with React Components.",
   "main": "./dist/index.js",
   "scripts": {
