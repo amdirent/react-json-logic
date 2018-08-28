@@ -1,6 +1,6 @@
 {
   "name": "@amdirent/react-json-logic",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Build and evaluate JsonLogic rules with React Components.",
   "main": "./dist/index.js",
   "scripts": {
@@ -32,13 +32,13 @@
     "url": "https://github.com/altayaydemir/react-json-logic/issues"
   },
   "peerDependencies": {
-    "prop-types": "*",
     "react": ">=15.0",
     "react-dom": ">=15.0"
   },
   "dependencies": {
     "brace": "0.9.1",
     "json-logic-js-enhanced": "1.1.0",
+    "prop-types": "^15.6.2",
     "react-ace": "4.1.1",
     "react-select": "1.0.0-rc.2"
   },
