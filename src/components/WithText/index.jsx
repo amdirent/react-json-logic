@@ -16,6 +16,7 @@ const propTypes = {
   parent: string.isRequired,
   value: any,
   onChange: func.isRequired,
+  text: string.isRequired,
 };
 
 const defaultProps = {
@@ -23,51 +24,52 @@ const defaultProps = {
   value: '',
 };
 
-export default (text) => {
-
-  class Then extends Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        value: props.value,
-      };
-    }
-
-    componentWillReceiveProps(nextProps) {
-      if (!isEqual(this.props.value, nextProps.value)) {
-        this.setState({
-          value: nextProps.value,
-        });
-      }
-    }
-
-    onChange = (value) => {
-      this.setState({ value }, () => this.props.onChange(value));
+class WithText extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: props.value,
     };
+  }
 
-    render() {
-      const { parent, data } = this.props;
-      const { value } = this.state;
-
-      return (
-        <div className={style.Wrapper}>
-          <div className={style.FatArrow}>
-            {text}
-          </div>
-
-          <div>
-            <Any
-              onChange={this.onChange}
-              parent={parent}
-              data={data}
-              value={value}
-            />
-          </div>
-        </div>
-      );
+  componentWillReceiveProps(nextProps) {
+    if (!isEqual(this.props.value, nextProps.value)) {
+      this.setState({
+        value: nextProps.value,
+      });
     }
   }
 
-  Then.propTypes = propTypes;
-  Then.defaultProps = defaultProps;
-};
+  onChange = (value) => {
+    this.setState({ value }, () => this.props.onChange(value));
+  };
+
+  render() {
+    const { text, parent, data } = this.props;
+    const { value } = this.state;
+
+    return (
+      <div className={style.Wrapper}>
+        <div className={style.FatArrow}>
+          {text}
+        </div>
+
+        <div>
+          <Any
+            onChange={this.onChange}
+            parent={parent}
+            data={data}
+            value={value}
+          />
+        </div>
+      </div>
+    );
+  }
+}
+
+WithText.propTypes = propTypes;
+WithText.defaultProps = defaultProps;
+
+export default text => ({
+  default: props => <WithText {...props} text={text} />,
+});

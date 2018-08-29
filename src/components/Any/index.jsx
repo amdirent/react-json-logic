@@ -96,7 +96,9 @@ class Any extends Component {
     ) {
       const extraFieldCount = value[field].length - fields.length;
       for (let i = 1; i <= extraFieldCount; i += 1) {
-        fields = [...fields, FIELD_TYPES.ANY];
+        const nextField = selectedOperator.getNextField ?
+          selectedOperator.getNextField(fields.length) : FIELD_TYPES.ANY;
+        fields = [...fields, nextField];
       }
     }
 
@@ -154,7 +156,10 @@ class Any extends Component {
   }
 
   addField = () => {
-    this.setState({ fields: [...this.state.fields, FIELD_TYPES.ANY] });
+    const selectedOperator = this.state.selectedOperator;
+    const nextField = selectedOperator.getNextField ?
+      selectedOperator.getNextField(this.state.fields.length) : FIELD_TYPES.ANY;
+    this.setState({ fields: [...this.state.fields, nextField] });
   }
 
   removeField = (index) => {

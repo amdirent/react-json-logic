@@ -10,6 +10,7 @@ export const FIELD_TYPES = {
   INPUT: require('./components/Input'),
   ACCESSOR: require('./components/Accessor'),
   HIGHER_ORDER: require('./components/HigherOrder'),
+  WITH_TEXT: require('./components/WithText/index').default,
 };
 
 /**
@@ -96,13 +97,35 @@ export const OPERATORS = [
   },
   {
     type: 'Statement',
+    signature: 'if',
+    label: 'if',
+    fields: [FIELD_TYPES.ANY, FIELD_TYPES.WITH_TEXT('then'), FIELD_TYPES.WITH_TEXT('else')],
+    notAvailableUnder: [],
+    getNextField: (index) => {
+      if (index === 0) {
+        return FIELD_TYPES.ANY;
+      }
+
+      if (index % 2 === 1) {
+        return FIELD_TYPES.WITH_TEXT('then');
+      }
+
+      return FIELD_TYPES.WITH_TEXT('else');
+    },
+    fieldCount: {
+      min: 3,
+      max: 100,
+    },
+  },
+  {
+    type: 'Statement',
     signature: 'or',
     label: 'or',
     fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY],
     notAvailableUnder: [],
     fieldCount: {
       min: 2,
-      max: 10,
+      max: 100,
     },
   },
   {
@@ -113,7 +136,7 @@ export const OPERATORS = [
     notAvailableUnder: [],
     fieldCount: {
       min: 2,
-      max: 10,
+      max: 100,
     },
   },
   {
@@ -179,7 +202,7 @@ export const OPERATORS = [
     notAvailableUnder: [],
     fieldCount: {
       min: 2,
-      max: 2,
+      max: 100,
     },
   },
   {
@@ -201,7 +224,7 @@ export const OPERATORS = [
     notAvailableUnder: [],
     fieldCount: {
       min: 2,
-      max: 2,
+      max: 100,
     },
   },
   {
@@ -216,22 +239,11 @@ export const OPERATORS = [
     },
   },
   {
-    type: 'Numeric',
-    signature: 'Between',
-    label: '<=',
-    fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY, FIELD_TYPES.ANY],
-    notAvailableUnder: [],
-    fieldCount: {
-      min: 3,
-      max: 3,
-    },
-  },
-  {
     type: 'Arithmetic',
     signature: '+',
     label: '+',
     fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY],
-    notAvailableUnder: ['master'],
+    notAvailableUnder: [],
     fieldCount: {
       min: 1,
       max: 100,
@@ -242,7 +254,7 @@ export const OPERATORS = [
     signature: '-',
     label: '-',
     fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY],
-    notAvailableUnder: ['master'],
+    notAvailableUnder: [],
     fieldCount: {
       min: 1,
       max: 2,
@@ -253,7 +265,7 @@ export const OPERATORS = [
     signature: '*',
     label: '*',
     fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY],
-    notAvailableUnder: ['master'],
+    notAvailableUnder: [],
     fieldCount: {
       min: 2,
       max: 100,
@@ -264,7 +276,7 @@ export const OPERATORS = [
     signature: '/',
     label: '/',
     fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY],
-    notAvailableUnder: ['master'],
+    notAvailableUnder: [],
     fieldCount: {
       min: 2,
       max: 2,
@@ -275,10 +287,32 @@ export const OPERATORS = [
     signature: '%',
     label: '%',
     fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY],
-    notAvailableUnder: ['master'],
+    notAvailableUnder: [],
     fieldCount: {
       min: 2,
       max: 2,
+    },
+  },
+  {
+    type: 'Arithmetic',
+    signature: 'max',
+    label: 'max',
+    fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY],
+    notAvailableUnder: [],
+    fieldCount: {
+      min: 2,
+      max: 100,
+    },
+  },
+  {
+    type: 'Arithmetic',
+    signature: 'min',
+    label: 'min',
+    fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY],
+    notAvailableUnder: [],
+    fieldCount: {
+      min: 2,
+      max: 100,
     },
   },
 ];
