@@ -295,6 +295,17 @@ export const OPERATORS = [
   },
   {
     type: 'Arithmetic',
+    signature: '^',
+    label: '^',
+    fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY],
+    notAvailableUnder: [],
+    fieldCount: {
+      min: 2,
+      max: 2,
+    },
+  },
+  {
+    type: 'Arithmetic',
     signature: 'max',
     label: 'max',
     fields: [FIELD_TYPES.ANY, FIELD_TYPES.ANY],
