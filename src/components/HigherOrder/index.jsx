@@ -10,7 +10,9 @@ import Any from '../Any';
 import style from './style.scss';
 
 // PropTypes
-const { any, func, object, string } = PropTypes;
+const {
+  any, func, object, string,
+} = PropTypes;
 const propTypes = {
   data: object,
   parent: string.isRequired,
@@ -29,22 +31,26 @@ class HigherOrder extends Component {
     this.state = {
       value: props.value,
     };
+
+    this.onChange = this.onChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!isEqual(this.props.value, nextProps.value)) {
+    const { value } = this.props;
+    if (!isEqual(value, nextProps.value)) {
       this.setState({
         value: nextProps.value,
       });
     }
   }
 
-  onChange = (value) => {
+  onChange(value) {
+    const { onChange } = this.props;
     const newValue = {
       '=>': [value],
     };
 
-    this.setState({ value: newValue }, () => this.props.onChange(newValue));
+    this.setState({ value: newValue }, () => onChange(newValue));
   }
 
   render() {

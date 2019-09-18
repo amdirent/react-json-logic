@@ -31,7 +31,9 @@ import style from './style.scss';
 import { FIELD_TYPES, OPERATORS } from '../../options';
 
 // PropTypes
-const { string, any, object, func } = PropTypes;
+const {
+  string, any, object, func,
+} = PropTypes;
 const propTypes = {
   onChange: func.isRequired,
   parent: string.isRequired,
@@ -44,72 +46,79 @@ const defaultProps = {
   data: {},
 };
 
+/**
+* Initializes component state with respect to props.
+*
+* This method will be called on initial render (from constructor) and cases like async loading,
+* which may end up with change in value prop.
+*/
+const onInitializeState = (props) => {
+  const { value } = props;
+  let field = 'value';
+  let selectedOperator = null;
+  let fields = [];
+
+  if (typeof value === 'object' && Object.keys(value).length > 0) {
+    const firstElem = Object.keys(value)[0];
+
+    // eslint-disable-next-line max-len
+    field = OPERATORS.some((operator) => operator.signature === firstElem || operator.label === firstElem)
+      ? firstElem
+      : 'value';
+  } else if (typeof value === 'object') {
+    field = '';
+  }
+
+  // eslint-disable-next-line max-len
+  selectedOperator = OPERATORS.find((operator) => operator.signature === field || operator.label === field);
+
+  if (selectedOperator) {
+    fields = selectedOperator.fields;
+  }
+
+  // Insert Extra Fields
+  if (
+    typeof value === 'object'
+    && Object.keys(value).length > 0
+    && selectedOperator.fieldCount.min <= fields.length
+    && selectedOperator.fieldCount.max > fields.length
+    && value[field].length > fields.length
+  ) {
+    const extraFieldCount = value[field].length - fields.length;
+    for (let i = 1; i <= extraFieldCount; i += 1) {
+      const nextField = selectedOperator.getNextField
+        ? selectedOperator.getNextField(fields.length)
+        : FIELD_TYPES.ANY;
+      fields = [...fields, nextField];
+    }
+  }
+
+  return {
+    field,
+    value,
+    selectedOperator,
+    fields,
+  };
+};
+
 class Any extends Component {
   constructor(props) {
     super(props);
-    this.state = this.onInitializeState(props);
-    
+    this.state = onInitializeState(props);
+
     this.onChildValueChange = this.onChildValueChange.bind(this);
     this.getAvailableOperators = this.getAvailableOperators.bind(this);
-    this.addField = this.addField.bind(this)
+    this.addField = this.addField.bind(this);
     this.removeField = this.removeField.bind(this);
     this.renderChild = this.renderChild.bind(this);
     this.onFieldChange = this.onFieldChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!isEqual(this.props.value, nextProps.value)) {
-      this.setState(this.onInitializeState(nextProps));
+    const { value } = this.props;
+    if (!isEqual(value, nextProps.value)) {
+      this.setState(onInitializeState(nextProps));
     }
-  }
-
-  /**
-   * Initializes component state with respect to props.
-   *
-   * This method will be called on initial render (from constructor) and cases like async loading,
-   * which may end up with change in value prop.
-   */
-  onInitializeState = (props) => {
-    const value = props.value;
-    let field = 'value';
-    let selectedOperator = null;
-    let fields = [];
-
-    if (typeof value === 'object' && Object.keys(value).length > 0) {
-      const firstElem = Object.keys(value)[0];
-
-      field = OPERATORS.some(operator =>
-        operator.signature === firstElem || operator.label === firstElem,
-      ) ? firstElem : 'value';
-    } else if (typeof value === 'object') {
-      field = '';
-    }
-
-    selectedOperator = OPERATORS.find(operator =>
-      operator.signature === field || operator.label === field,
-    );
-
-    if (selectedOperator) {
-      fields = selectedOperator.fields;
-    }
-
-    // Insert Extra Fields
-    if (
-      typeof value === 'object' 
-      && Object.keys(value).length > 0
-      && selectedOperator.fieldCount.min <= fields.length
-      && selectedOperator.fieldCount.max > fields.length
-      && value[field].length > fields.length
-    ) {
-      const extraFieldCount = value[field].length - fields.length;
-      for (let i = 1; i <= extraFieldCount; i += 1) {
-        const nextField = selectedOperator.getNextField ?
-          selectedOperator.getNextField(fields.length) : FIELD_TYPES.ANY;
-        fields = [...fields, nextField];
-      }
-    }
-
-    return { field, value, selectedOperator, fields };
   }
 
   /**
@@ -126,7 +135,7 @@ class Any extends Component {
     }
 
     onChange(value);
-  };
+  }
 
   /**
    * Updates its own state and emits changes to the parrent.
@@ -153,9 +162,8 @@ class Any extends Component {
   getAvailableOperators() {
     const { parent, data } = this.props;
 
-    let operators = OPERATORS.filter((operator) => {
-      !operator.notAvailableUnder.some((item) => item === parent);
-    });
+    // eslint-disable-next-line max-len
+    let operators = OPERATORS.filter((operator) => !operator.notAvailableUnder.some((item) => item === parent));
 
     if (Object.keys(data).length === 0) {
       operators = operators.filter((operator) => operator.signature !== 'var');
@@ -189,10 +197,7 @@ class Any extends Component {
    */
   renderChild(childField, index) {
     const {
-      field,
-      value,
-      selectedOperator,
-      fields,
+      field, value, selectedOperator, fields,
     } = this.state;
     const parent = field;
     const parentValue = value;
@@ -211,19 +216,16 @@ class Any extends Component {
     const { data } = this.props;
     return (
       <div style={{ position: 'relative' }} key={`${parent}.${index}`}>
-        {
-          isRemovable
-          && (
-            <button
-              type="button"
-              className={style.ChildrenControlButton}
-              style={{ position: 'absolute', left: -21, height: 26 }}
-              onClick={() => this.removeField(index)}
-            >
-              x
-            </button>
-          )
-        }
+        {isRemovable && (
+          <button
+            type="button"
+            className={style.ChildrenControlButton}
+            style={{ position: 'absolute', left: -21, height: 26 }}
+            onClick={() => this.removeField(index)}
+          >
+            x
+          </button>
+        )}
 
         <ChildComponent
           parent={parent}
@@ -251,35 +253,27 @@ class Any extends Component {
           onChange={this.onFieldChange}
         />
 
-        {
-          canAddMoreChildren
-          && (
-            <button
-              type="button"
-              className={style.ChildrenControlButton}
-              style={
-                {
-                  position: 'absolute',
-                  width: 26,
-                  height: 26,
-                  marginLeft: 1,
-                }
-              }
-              onClick={() => this.addField()}
-            >
+        {canAddMoreChildren && (
+          <button
+            type="button"
+            className={style.ChildrenControlButton}
+            style={{
+              position: 'absolute',
+              width: 26,
+              height: 26,
+              marginLeft: 1,
+            }}
+            onClick={() => this.addField()}
+          >
             +
-            </button>
-          )
-        }
+          </button>
+        )}
 
-        {
-          selectedOperator
-          && (
-            <div style={{ marginLeft: 20, marginTop: 5, marginBottom: 5 }}>
-              {fields.map(this.renderChild)}
-            </div>
-          )
-        }
+        {selectedOperator && (
+          <div style={{ marginLeft: 20, marginTop: 5, marginBottom: 5 }}>
+            {fields.map(this.renderChild)}
+          </div>
+        )}
       </div>
     );
   }

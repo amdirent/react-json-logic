@@ -26,7 +26,7 @@ import style from './style.scss';
 const INPUT_TYPES = ['text', 'number']; // @TODO: Add Date!
 
 // Helpers
-const isNumeric = value => typeof value === 'number';
+const isNumeric = (value) => typeof value === 'number';
 const getType = (value, defaultType) => {
   if (isNumeric(value)) {
     return 'number';
@@ -57,6 +57,9 @@ class Input extends Component {
       value: props.value,
       type: getType(props.value, props.type),
     };
+
+    this.onValueChange = this.onValueChange.bind(this);
+    this.onTypeChange = this.onTypeChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -70,9 +73,10 @@ class Input extends Component {
     }
   }
 
-  onTypeChange = (e) => {
+  onTypeChange(e) {
     const type = e.value;
     let { value } = this.state;
+    const { onChange } = this.props;
 
     if (type === 'number') {
       value = parseFloat(value);
@@ -80,18 +84,17 @@ class Input extends Component {
       value = value.toString();
     }
 
-    this.setState({ type }, () => this.props.onChange(value));
+    this.setState({ type }, () => onChange(value));
   }
 
-  onValueChange = (e) => {
+  onValueChange(e) {
     const { type } = this.state;
-    let value = e.target.value;
-
+    let { value } = e.target.value;
+    const { onChange } = this.props;
     if (type === 'number') {
       value = parseFloat(value);
     }
-
-    this.props.onChange(value);
+    onChange(value);
   }
 
   render() {
@@ -105,7 +108,7 @@ class Input extends Component {
             clearable={false}
             value={type}
             onChange={this.onTypeChange}
-            options={INPUT_TYPES.map(inputType => ({
+            options={INPUT_TYPES.map((inputType) => ({
               label: inputType,
               value: inputType,
             }))}

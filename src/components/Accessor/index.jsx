@@ -26,6 +26,9 @@ class Accessor extends Component {
     this.state = {
       value: props.value,
     };
+
+    this.onChange = this.onChange.bind(this);
+    this.renderSelector = this.renderSelector.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -38,16 +41,18 @@ class Accessor extends Component {
     }
   }
 
-  onChange = (value, level) => {
-    let values = this.state.value.split('.').slice(0, level);
+  onChange(value, level) {
+    const { onChange } = this.props;
+
+    let values = value.split('.').slice(0, level);
 
     values[level] = value;
     values = values.join('.');
 
-    this.props.onChange(values);
+    onChange(values);
   }
 
-  renderSelector = (data, level) => {
+  renderSelector(data, level) {
     const { value } = this.state;
     const splittedValue = value.split('.');
     const levelValue = splittedValue[level] || '';
@@ -60,7 +65,7 @@ class Accessor extends Component {
       iterator = Object.keys(data);
     }
 
-    if (levelValue !== '' && !iterator.some(item => item === levelValue)) {
+    if (levelValue !== '' && !iterator.some((item) => item === levelValue)) {
       iterator = [levelValue, ...iterator];
     }
 
@@ -71,12 +76,12 @@ class Accessor extends Component {
             <Select.Creatable
               clearable={false}
               value={levelValue}
-              onChange={e => this.onChange(e.value, level)}
-              options={iterator.map(item => ({
+              onChange={(e) => this.onChange(e.value, level)}
+              options={iterator.map((item) => ({
                 label: item,
                 value: item,
               }))}
-              promptTextCreator={label => `Create option: ${label}`}
+              promptTextCreator={(label) => `Create option: ${label}`}
             />
           </div>
 
@@ -89,9 +94,10 @@ class Accessor extends Component {
   }
 
   render() {
+    const { data } = this.props;
     return (
       <div>
-        {this.renderSelector(this.props.data, 0)}
+        {this.renderSelector(data, 0)}
       </div>
     );
   }

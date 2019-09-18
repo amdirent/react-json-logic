@@ -20,8 +20,8 @@ const SelectOperator = ({ value, options, onChange }) => (
     <Select
       clearable={false}
       value={value}
-      onChange={e => onChange(e.value)}
-      options={options.map(option => ({
+      onChange={(e) => onChange(e.value)}
+      options={options.map((option) => ({
         label: option.label,
         value: option.signature,
       }))}

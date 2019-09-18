@@ -10,7 +10,10 @@ import Any from '../Any';
 import style from './style.scss';
 
 // PropTypes
-const { any, func, object, string } = PropTypes;
+const {
+  any, func, object, string,
+} = PropTypes;
+
 const propTypes = {
   data: object,
   parent: string.isRequired,
@@ -30,19 +33,23 @@ class WithText extends Component {
     this.state = {
       value: props.value,
     };
+    this.onChange = this.onChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!isEqual(this.props.value, nextProps.value)) {
+    const { value } = this.props;
+
+    if (!isEqual(value, nextProps.value)) {
       this.setState({
         value: nextProps.value,
       });
     }
   }
 
-  onChange = (value) => {
-    this.setState({ value }, () => this.props.onChange(value));
-  };
+  onChange(value) {
+    const { onChange } = this.props;
+    this.setState({ value }, () => onChange(value));
+  }
 
   render() {
     const { text, parent, data } = this.props;
@@ -68,8 +75,18 @@ class WithText extends Component {
 }
 
 WithText.propTypes = propTypes;
+// WithText.propTypes = { data: React.PropTypes.object};
 WithText.defaultProps = defaultProps;
 
-export default text => ({
-  default: props => <WithText {...props} text={text} />,
+export default (text) => ({
+  default: () => {
+    const {
+      data,
+      parent,
+      value,
+      onChange,
+    } = this.props;
+
+    return <WithText data={data} parent={parent} value={value} onChange={onChange} text={text} />;
+  },
 });
