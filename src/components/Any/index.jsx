@@ -48,6 +48,13 @@ class Any extends Component {
   constructor(props) {
     super(props);
     this.state = this.onInitializeState(props);
+    
+    this.onChildValueChange = this.onChildValueChange.bind(this);
+    this.getAvailableOperators = this.getAvailableOperators.bind(this);
+    this.addField = this.addField.bind(this)
+    this.removeField = this.removeField.bind(this);
+    this.renderChild = this.renderChild.bind(this);
+    this.onFieldChange = this.onFieldChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -88,11 +95,11 @@ class Any extends Component {
 
     // Insert Extra Fields
     if (
-      typeof value === 'object' &&
-      Object.keys(value).length > 0 &&
-      selectedOperator.fieldCount.min <= fields.length &&
-      selectedOperator.fieldCount.max > fields.length &&
-      value[field].length > fields.length
+      typeof value === 'object' 
+      && Object.keys(value).length > 0
+      && selectedOperator.fieldCount.min <= fields.length
+      && selectedOperator.fieldCount.max > fields.length
+      && value[field].length > fields.length
     ) {
       const extraFieldCount = value[field].length - fields.length;
       for (let i = 1; i <= extraFieldCount; i += 1) {
@@ -108,7 +115,8 @@ class Any extends Component {
   /**
    * Resets the content and type of its children.
    */
-  onFieldChange = (field) => {
+  onFieldChange(field) {
+    const { onChange } = this.props;
     let value = {};
 
     if (field === 'value') {
@@ -117,15 +125,16 @@ class Any extends Component {
       value[field] = [];
     }
 
-    this.props.onChange(value);
+    onChange(value);
   };
 
   /**
    * Updates its own state and emits changes to the parrent.
    */
-  onChildValueChange = (childValue, index) => {
-    const field = this.state.field;
-    let value = this.state.value;
+  onChildValueChange(childValue, index) {
+    const { field } = this.state;
+    const { onChange } = this.props;
+    let { value } = this.state;
 
     if (field === 'value') {
       value = childValue;
@@ -133,7 +142,7 @@ class Any extends Component {
       value[field][index] = childValue;
     }
 
-    this.props.onChange(value);
+    onChange(value);
   }
 
   /**
@@ -141,42 +150,50 @@ class Any extends Component {
    * Removes accessor field from the list if props.data is empty
    * Return value of this method will be the entry point of Select component.
    */
-  getAvailableOperators = () => {
+  getAvailableOperators() {
     const { parent, data } = this.props;
 
-    let operators = OPERATORS.filter(operator =>
-      !operator.notAvailableUnder.some(item => item === parent),
-    );
+    let operators = OPERATORS.filter((operator) => {
+      !operator.notAvailableUnder.some((item) => item === parent);
+    });
 
     if (Object.keys(data).length === 0) {
-      operators = operators.filter(operator => operator.signature !== 'var');
+      operators = operators.filter((operator) => operator.signature !== 'var');
     }
 
     return operators;
   }
 
-  addField = () => {
-    const selectedOperator = this.state.selectedOperator;
-    const nextField = selectedOperator.getNextField ?
-      selectedOperator.getNextField(this.state.fields.length) : FIELD_TYPES.ANY;
-    this.setState({ fields: [...this.state.fields, nextField] });
+  addField() {
+    const { selectedOperator, fields } = this.state;
+    const nextField = selectedOperator.getNextField
+      ? selectedOperator.getNextField(fields.length)
+      : FIELD_TYPES.ANY;
+
+    this.setState({ fields: [...fields, nextField] });
   }
 
-  removeField = (index) => {
+  removeField(index) {
     const { value, field, fields } = this.state;
+    const { onChange } = this.props;
 
     fields.splice(index, 1);
     value[field].splice(index, 1);
 
-    this.setState({ fields, value }, () => this.props.onChange(value));
+    this.setState({ fields, value }, () => onChange(value));
   }
 
   /**
    * Renders child component by checking its type, initial value.
    * Also passes onChange action and data (which will be consumed by Accessor field) to the child.
    */
-  renderChild = (childField, index) => {
-    const { field, value, selectedOperator, fields } = this.state;
+  renderChild(childField, index) {
+    const {
+      field,
+      value,
+      selectedOperator,
+      fields,
+    } = this.state;
     const parent = field;
     const parentValue = value;
     const isRemovable = fields.length > selectedOperator.fieldCount.min;
@@ -191,24 +208,28 @@ class Any extends Component {
 
     const ChildComponent = childField.default;
 
+    const { data } = this.props;
     return (
       <div style={{ position: 'relative' }} key={`${parent}.${index}`}>
-        {isRemovable &&
-          <button
-            type="button"
-            className={style.ChildrenControlButton}
-            style={{ position: 'absolute', left: -21, height: 26 }}
-            onClick={() => this.removeField(index)}
-          >
-            x
-          </button>
+        {
+          isRemovable
+          && (
+            <button
+              type="button"
+              className={style.ChildrenControlButton}
+              style={{ position: 'absolute', left: -21, height: 26 }}
+              onClick={() => this.removeField(index)}
+            >
+              x
+            </button>
+          )
         }
 
         <ChildComponent
           parent={parent}
           value={childValue}
-          onChange={val => this.onChildValueChange(val, index)}
-          data={this.props.data}
+          onChange={(val) => this.onChildValueChange(val, index)}
+          data={data}
         />
       </div>
     );
@@ -230,21 +251,34 @@ class Any extends Component {
           onChange={this.onFieldChange}
         />
 
-        {canAddMoreChildren &&
-          <button
-            type="button"
-            className={style.ChildrenControlButton}
-            style={{ position: 'absolute', width: 26, height: 26, marginLeft: 1 }}
-            onClick={() => this.addField()}
-          >
+        {
+          canAddMoreChildren
+          && (
+            <button
+              type="button"
+              className={style.ChildrenControlButton}
+              style={
+                {
+                  position: 'absolute',
+                  width: 26,
+                  height: 26,
+                  marginLeft: 1,
+                }
+              }
+              onClick={() => this.addField()}
+            >
             +
-          </button>
+            </button>
+          )
         }
 
-        {selectedOperator &&
-          <div style={{ marginLeft: 20, marginTop: 5, marginBottom: 5 }}>
-            {fields.map(this.renderChild)}
-          </div>
+        {
+          selectedOperator
+          && (
+            <div style={{ marginLeft: 20, marginTop: 5, marginBottom: 5 }}>
+              {fields.map(this.renderChild)}
+            </div>
+          )
         }
       </div>
     );

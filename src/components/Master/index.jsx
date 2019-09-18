@@ -22,7 +22,13 @@ import Any from '../Any';
 import style from './style.scss';
 
 // PropTypes
-const { func, object, string, oneOfType } = PropTypes;
+const {
+  func,
+  object,
+  string,
+  oneOfType,
+} = PropTypes;
+
 const propTypes = {
   onChange: func.isRequired,
   value: object,
@@ -40,17 +46,25 @@ class JsonLogicBuilder extends Component {
     this.state = {
       value: props.value,
     };
+
+    this.onChange = this.onChange.bind(this);
+    this.parseData = this.parseData.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!isEqual(this.props.value, nextProps.value)) {
+    const { value } = this.props;
+    if (!isEqual(value, nextProps.value)) {
       this.setState({ value: nextProps.value });
     }
   }
 
-  onChange = value => this.setState({ value }, () => this.props.onChange(value))
+  onChange(value) {
+    const { onChange } = this.props;
+    this.setState({ value }, () => onChange(value));
+  }
 
-  parseData = (data) => {
+  parseData() {
+    const { data } = this.props;
     if (typeof data !== 'object') {
       try {
         return JSON.parse(data);
@@ -63,13 +77,14 @@ class JsonLogicBuilder extends Component {
   }
 
   render() {
+    const { value } = this.state;
     return (
       <div className={style.Wrapper}>
         <Any
           parent="master"
-          data={this.parseData(this.props.data)}
+          data={this.parseData()}
           onChange={this.onChange}
-          value={this.state.value}
+          value={value}
         />
       </div>
     );
