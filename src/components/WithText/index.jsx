@@ -75,18 +75,18 @@ class WithText extends Component {
 }
 
 WithText.propTypes = propTypes;
-// WithText.propTypes = { data: React.PropTypes.object};
 WithText.defaultProps = defaultProps;
 
 export default (text) => ({
-  default: (props) => {
-    const {
-      data,
-      parent,
-      value,
-      onChange,
-    } = props;
-
-    return <WithText data={data} parent={parent} value={value} onChange={onChange} text={text} />;
-  },
+  default: ({
+    data,
+    parent,
+    value,
+    onChange,
+  }: {
+  data: PropTypes.object,
+  parent: PropTypes.string.isRequired,
+  value: PropTypes.any,
+  onChange: PropTypes.func.isRequired,
+  }) => (<WithText data={data} parent={parent} value={value} onChange={onChange} text={text} />),
 });
