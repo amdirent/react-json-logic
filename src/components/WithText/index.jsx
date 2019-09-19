@@ -79,13 +79,13 @@ WithText.propTypes = propTypes;
 WithText.defaultProps = defaultProps;
 
 export default (text) => ({
-  default: () => {
+  default: (props) => {
     const {
       data,
       parent,
       value,
       onChange,
-    } = this.props;
+    } = props;
 
     return <WithText data={data} parent={parent} value={value} onChange={onChange} text={text} />;
   },
