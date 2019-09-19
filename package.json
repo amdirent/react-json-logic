@@ -4,7 +4,9 @@
   "description": "Build and evaluate JsonLogic rules with React Components.",
   "main": "./dist/index.js",
   "files": [
-    "./dist/index.js"
+    "dist",
+    "src",
+    "lib"
   ],
   "scripts": {
     "dev": "concurrently \"yarn-or-npm run start\" \"yarn-or-npm run start:docs\"",
