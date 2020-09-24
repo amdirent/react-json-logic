@@ -5,7 +5,7 @@ const config = require('../config');
 
 new WebpackDevServer(webpack(webpackConfig), {
   publicPath: webpackConfig.output.publicPath,
-  hot: true,
+  hot: false,
   historyApiFallback: {
     index: webpackConfig.output.publicPath,
   },

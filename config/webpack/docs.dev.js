@@ -4,21 +4,18 @@ const webpack = require('webpack');
 // Constants & Configs
 const config = require('../');
 const plugins = require('./_plugins');
-const loaders = require('./_loaders.dev');
-const preLoaders = require('./_preLoaders');
+const rules = require('./_rules.dev');
 const resolve = require('./_resolve');
 const htmlPlugin = require('./_htmlPlugin');
-const postcss = require('./_postCSS');
 
 // Main Config for Lib & Docs Development
 module.exports = {
+  mode: 'development',
   resolve,
 
   entry: {
     app: [
       `webpack-dev-server/client?http://${config.host}:${config.port}`,
-      'webpack/hot/only-dev-server',
-      'react-hot-loader/patch',
       'babel-polyfill',
       './examples/index.jsx',
     ],
@@ -31,14 +28,10 @@ module.exports = {
   },
 
   module: {
-    preLoaders,
-    loaders,
+    rules,
   },
 
-  postcss,
-
-  plugins: plugins.concat(htmlPlugin, [
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin(),
-  ]),
+  plugins: plugins.concat(
+    htmlPlugin,
+  ),
 };

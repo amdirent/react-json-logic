@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactJsonLogic, { applyLogic } from '../../../dist';
-import '../../../dist/style.css';
+import '../../../dist/style.css'
 
 import Editor from '../Editor';
 import style from './style.scss';

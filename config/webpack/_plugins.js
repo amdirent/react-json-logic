@@ -1,12 +1,5 @@
-const webpack = require('webpack');
-const extractCSS = require('./_extractCSS');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = [
-  extractCSS,
-
-  new webpack.DefinePlugin({
-    'process.env': {
-      NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-    },
-  }),
+  new MiniCssExtractPlugin({filename: 'style.css'}),
 ];

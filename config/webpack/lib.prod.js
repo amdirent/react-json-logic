@@ -2,16 +2,12 @@
 const config = require('../');
 const name = require('../../package.json').name;
 const plugins = require('./_plugins');
-const productionPlugins = require('./_plugins.prod');
-const loaders = require('./_loaders.prod');
-const preLoaders = require('./_preLoaders');
+const rules = require('./_rules.prod');
 const resolve = require('./_resolve');
-const externals = require('./_externals');
-const postcss = require('./_postCSS');
 
 // Main Config for Lib & Docs Development
 module.exports = {
-  debug: false,
+  mode: 'production',
   devtool: 'module-source-map',
 
   resolve,
@@ -26,13 +22,8 @@ module.exports = {
   },
 
   module: {
-    preLoaders,
-    loaders,
+    rules,
   },
 
-  postcss,
-
-  externals,
-
-  plugins: plugins.concat(productionPlugins),
+  plugins
 };

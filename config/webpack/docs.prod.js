@@ -1,17 +1,13 @@
 // Constants & Configs
 const config = require('../');
 const plugins = require('./_plugins');
-const productionPlugins = require('./_plugins.prod');
-const chunkPlugin = require('./_chunkPlugin');
-const loaders = require('./_loaders.prod');
-const preLoaders = require('./_preLoaders');
+const rules = require('./_rules.prod');
 const resolve = require('./_resolve');
 const htmlPlugin = require('./_htmlPlugin');
-const postcss = require('./_postCSS');
 
 // Main Config for Lib & Docs Development
 module.exports = {
-  debug: false,
+  mode: 'production',
   devtool: false,
   resolve,
 
@@ -33,15 +29,10 @@ module.exports = {
   },
 
   module: {
-    preLoaders,
-    loaders,
+    rules
   },
 
-  postcss,
-
   plugins: plugins.concat(
-    productionPlugins,
     htmlPlugin,
-    chunkPlugin
   ),
 };

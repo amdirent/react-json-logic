@@ -12,7 +12,8 @@
 // Core
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import 'react-select/dist/react-select.min.css';
+// import '../react-select/dist/react-select.min.css';
+import '../../../node_modules/react-select/dist/react-select.min'
 
 // Helpers
 import isEqual from 'lodash.isequal';
